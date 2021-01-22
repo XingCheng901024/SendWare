@@ -1,15 +1,26 @@
 package com.hxbank.util;
 
+import com.hxbank.listener.BaseEntity;
 import java.io.*;
 import java.net.Socket;
 import java.util.concurrent.CountDownLatch;
 
-public class SocketUtil {
+public class SocketUtil extends BaseEntity {
 
     private static final String FILE_START = "file:";
     private static final String MESSAGE_END = "@@@@";
     private static final String FILE_NAME_END = "$_?";
 
+    public void init(){
+        System.out.println("socket initing ...");
+        System.out.println(protol);
+        System.out.println(method);
+        System.out.println(getHost());
+        System.out.println(getPort());
+        System.out.println(url);
+        System.out.println(filePathStr);
+        System.out.println(requestContext);
+    }
 
     /**
      * 示例：String str = "Xhj1001#1153285#201310230099112#10250001002171482#1#1#对私#1|6226310510420134|135067|500|J|#@@@@";
@@ -18,30 +29,30 @@ public class SocketUtil {
      * @return
      */
     public static String send() throws IOException {
-        Socket socket = new Socket("localhost", 5500);
+        Socket socket = new Socket(getHost(), Integer.parseInt(getPort()));
         OutputStream os = socket.getOutputStream();
         InputStream iss = socket.getInputStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(iss, "utf-8"));
-        File imageFile = new File("D:\\邮件附件\\CR20418_企业网银系统_应用系统工作量估算表（备份）.xls");
-        InputStream is = new FileInputStream(imageFile);
-        long fileLength = imageFile.length();
-        System.out.println("图片长度：" + fileLength);
+        File sendFile = new File(filePathStr);
+        InputStream is = new FileInputStream(sendFile);
+        long fileLength = sendFile.length();
+        System.out.println("文件长度：" + fileLength);
         /*发送第一部分的文本信息，对应text1*/
-        int a = "xhj3003#10250000001602678#100000#1#".getBytes().length;
-        os.write("xhj3003#10250000001602678#100000#1#".getBytes());
-        /*发送图片开始的标识，对应image_start*/
+        int a = requestContext.getBytes().length;
+        os.write(requestContext.getBytes());
+        /*发送开始的标识，对应image_start*/
         int c = FILE_START.getBytes().length;
         os.write(FILE_START.getBytes());
-        // 发送图片文件名称，对应image_file_name
-        int d = imageFile.getName().getBytes().length;
-        os.write(imageFile.getName().getBytes());
-        //  发送图片文件名称结束的标识，对应image_file_name_end
+        // 发送文件名称，对应image_file_name
+        int d = sendFile.getName().getBytes().length;
+        os.write(sendFile.getName().getBytes());
+        //  发送文件名称结束的标识，对应image_file_name_end
         int f = FILE_NAME_END.getBytes().length;
         os.write(FILE_NAME_END.getBytes());
-        //  发送图片文件的长度，对应image_file_length
+        //  发送文件的长度，对应image_file_length
         byte[] bs = LongToBytes(a + c + d + f);
         os.write(bs);
-        //  发送图片文件，对应image
+        //  发送文件，对应image
         int length;
         byte[] b = new byte[1024];
         while ((length = is.read(b)) > 0) {

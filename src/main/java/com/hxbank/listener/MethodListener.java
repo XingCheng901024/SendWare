@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class MethodListener extends BaseListener implements ActionListener {
+public class MethodListener extends BaseEntity implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {

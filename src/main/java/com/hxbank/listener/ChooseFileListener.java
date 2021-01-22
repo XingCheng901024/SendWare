@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-public class ChooseFileListener extends BaseListener implements ActionListener {
+public class ChooseFileListener extends BaseEntity implements ActionListener {
 
     private static JTextField filePath;
 

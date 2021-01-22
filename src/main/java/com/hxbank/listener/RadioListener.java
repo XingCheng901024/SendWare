@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
-public class RadioListener extends BaseListener implements ItemListener {
+public class RadioListener extends BaseEntity implements ItemListener {
     private static JPanel urlPanel;
     private static JPanel methodPanel;
 
