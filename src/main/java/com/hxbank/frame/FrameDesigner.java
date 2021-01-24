@@ -8,6 +8,7 @@ public class FrameDesigner {
     public static JPanel protolPanel = new JPanel(); // 创建面板，这个类似于 HTML 的 div 标签
     public static JPanel urlPanel = new JPanel(); // 创建Url面板
     public static JPanel methodPanel = new JPanel(); // 创建method面板
+    public static JPanel typePanel = new JPanel(); // 创建type面板
     public static JPanel filePanel = new JPanel(); // 创建选择文件面板
     public static JPanel requTitlePanel = new JPanel(); // 创建请求标题面板
     public static JPanel requContextPanel = new JPanel(); // 创建请求内容面板

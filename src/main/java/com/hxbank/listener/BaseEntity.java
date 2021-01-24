@@ -5,6 +5,7 @@ public class BaseEntity {
     public static String protol;
     public static String method;
     public static String url;
+    public static String type;
     public static String filePathStr;
     public static String requestContext;
 

@@ -1,10 +1,7 @@
 package com.hxbank;
 
 import com.hxbank.frame.FrameDesigner;
-import com.hxbank.listener.ChooseFileListener;
-import com.hxbank.listener.MethodListener;
-import com.hxbank.listener.RadioListener;
-import com.hxbank.listener.SendListener;
+import com.hxbank.listener.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,11 +15,12 @@ public class App{
     private static FrameDesigner frameDesigner = FrameDesigner.getInstance();
 
     public static void main( String[] args ) {
-        frameDesigner.frame.setLayout(new FlowLayout());
+        frameDesigner.frame.setLayout(new GridLayout(5,5));
         placeProtolComponents();
         placeUrlComponents();
-        placeMethodComponents();
+        // placeMethodComponents();
         placeSendComponents();
+        placeTypeComponents();
         placeFileComponents();
         placeReqeustTitle();
         placeReqeustContent();
@@ -67,11 +65,12 @@ public class App{
 
     private static void placeUrlComponents(){
         JLabel userLabel = new JLabel("Url:");
-        urlPanel.add(frameDesigner.methodPanel,BorderLayout.CENTER);
+        // todo urlPanel.add(frameDesigner.methodPanel,BorderLayout.CENTER);
         urlPanel.add(userLabel);
 
         urlPanel.add(frameDesigner.urlText);
         frameDesigner.frame.add(urlPanel,BorderLayout.CENTER);
+        frameDesigner.frame.add(frameDesigner.typePanel,BorderLayout.CENTER);
     }
 
     private static void placeSendComponents(){
@@ -79,6 +78,15 @@ public class App{
         JButton send = new JButton("发送");
         send.addActionListener(new SendListener());
         urlPanel.add(send);
+    }
+
+    private static void placeTypeComponents(){
+        TypeListener typeListener = new TypeListener();
+        JComboBox selectList = new JComboBox();
+        selectList.addItem("Xml");
+        selectList.addItem("Separator");
+        selectList.addActionListener(typeListener);
+        frameDesigner.typePanel.add(selectList);
     }
 
     private static void placeFileComponents(){
