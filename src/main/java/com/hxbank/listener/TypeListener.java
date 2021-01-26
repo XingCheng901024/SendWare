@@ -4,10 +4,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import static com.hxbank.frame.FrameDesigner.filePanel;
 import static com.hxbank.frame.FrameDesigner.frame;
 
 public class TypeListener extends BaseEntity implements ActionListener {
+
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         JComboBox methodBox = (JComboBox) actionEvent.getSource();
@@ -19,7 +21,7 @@ public class TypeListener extends BaseEntity implements ActionListener {
         }else if("Xml".equals(type)){
             frame.add(filePanel, BorderLayout.CENTER);
             frame.repaint();
-        }else {}
+        }else{}
     }
 
 }

@@ -1,5 +1,6 @@
 package com.hxbank.util;
 
+import com.hxbank.frame.FrameDesigner;
 import com.hxbank.listener.BaseEntity;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -8,6 +9,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -15,9 +17,17 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
+import java.awt.*;
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.hxbank.frame.FrameDesigner.filePanel;
+import static com.hxbank.frame.FrameDesigner.frame;
 
 public class HttpUtil extends BaseEntity {
+
+    private static FrameDesigner frameDesigner = FrameDesigner.getInstance();
 
     private static final String MESSAGE_END = "@@@@";
 
@@ -33,7 +43,65 @@ public class HttpUtil extends BaseEntity {
 
     }
 
-    public static void send() throws UnsupportedEncodingException {
+    public static void send(){
+        if("Separator".equals(type)){
+            sendWithSeparator();
+        }else if("Xml".equals(type)){
+            try {
+                sendWithXml();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+                frameDesigner.respTextArea.setText(e.getMessage());
+            }
+        }else{}
+    }
+
+    public static void sendWithSeparator(){
+        // 获得Http客户端(可以理解为:你得先有一个浏览器;注意:实际上HttpClient与浏览器是不一样的)
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost httpPost = new HttpPost(url);
+        /*StringBuffer params = new StringBuffer();
+        params.append("command=" + requestContext + MESSAGE_END);
+        // 创建post请求
+        HttpPost httpPost = new HttpPost(url+"?"+params);*/
+        httpPost.setHeader("Content-Type", "text/html;charset=GBK");
+        try {
+            httpPost.setEntity(new ByteArrayEntity(new String("command=" + requestContext + MESSAGE_END).getBytes("GBK")));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            frameDesigner.respTextArea.setText(e.getMessage());
+        }
+
+        CloseableHttpResponse response = null;
+        try {
+            response = httpClient.execute(httpPost);
+            HttpEntity responseEntity = response.getEntity();
+            String respContext = EntityUtils.toString(responseEntity);
+            System.out.println("响应内容为:" + respContext);
+            frameDesigner.respTextArea.setText(respContext);
+        } catch (IOException e) {
+            e.printStackTrace();
+            frameDesigner.respTextArea.setText(e.getMessage());
+        } catch (ParseException e) {
+            e.printStackTrace();
+            frameDesigner.respTextArea.setText(e.getMessage());
+        } finally {
+            try {
+                // 释放资源
+                if (httpClient != null) {
+                    httpClient.close();
+                }
+                if (response != null) {
+                    response.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                frameDesigner.respTextArea.setText(e.getMessage());
+            }
+        }
+    }
+
+    public static void sendWithXml() throws UnsupportedEncodingException {
         // 获得Http客户端(可以理解为:你得先有一个浏览器;注意:实际上HttpClient与浏览器是不一样的)
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         // 参数
@@ -51,8 +119,10 @@ public class HttpUtil extends BaseEntity {
                 response = httpClient.execute(httpGet);
             } catch (IOException e) {
                 e.printStackTrace();
+                frameDesigner.respTextArea.setText(e.getMessage());
             } catch (ParseException e) {
                 e.printStackTrace();
+                frameDesigner.respTextArea.setText(e.getMessage());
             } finally {
                 try {
                     // 释放资源
@@ -64,6 +134,7 @@ public class HttpUtil extends BaseEntity {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                    frameDesigner.respTextArea.setText(e.getMessage());
                 }
             }
         }else if("post".equals(method)){
@@ -72,10 +143,13 @@ public class HttpUtil extends BaseEntity {
             File file = new File(filePathStr);
             MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create().setMode(HttpMultipartMode.RFC6532);
             try {
-                multipartEntityBuilder.addBinaryBody("file", new FileInputStream(file), ContentType.DEFAULT_BINARY, file.getName());
+                if(!isFileBlank()){
+                    multipartEntityBuilder.addBinaryBody("file", new FileInputStream(file), ContentType.DEFAULT_BINARY, file.getName());
+                }
                 multipartEntityBuilder.addTextBody("command", requestContext + MESSAGE_END);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
+                frameDesigner.respTextArea.setText(e.getMessage());
             }
             HttpEntity httpEntity = multipartEntityBuilder.build();
             httpPost.setEntity(httpEntity);
@@ -88,17 +162,23 @@ public class HttpUtil extends BaseEntity {
                 if (responseEntity != null) {
                     System.out.println("响应内容长度为:" + responseEntity.getContentLength());
                     try {
-                        System.out.println("响应内容为:" + EntityUtils.toString(responseEntity));
+                        String respContext = EntityUtils.toString(responseEntity);
+                        System.out.println("响应内容为:" + respContext);
+                        frameDesigner.respTextArea.setText(respContext);
                     } catch (IOException e) {
                         e.printStackTrace();
+                        frameDesigner.respTextArea.setText(e.getMessage());
                     }
                 }
             } catch (ClientProtocolException e) {
                 e.printStackTrace();
+                frameDesigner.respTextArea.setText(e.getMessage());
             } catch (ParseException e) {
                 e.printStackTrace();
+                frameDesigner.respTextArea.setText(e.getMessage());
             } catch (IOException e) {
                 e.printStackTrace();
+                frameDesigner.respTextArea.setText(e.getMessage());
             } finally {
                 try {
                     // 释放资源
@@ -110,6 +190,7 @@ public class HttpUtil extends BaseEntity {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                    frameDesigner.respTextArea.setText(e.getMessage());
                 }
             }
         }

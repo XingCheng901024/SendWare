@@ -6,7 +6,7 @@ import com.hxbank.listener.*;
 import javax.swing.*;
 import java.awt.*;
 
-import static com.hxbank.frame.FrameDesigner.urlPanel;
+import static com.hxbank.frame.FrameDesigner.*;
 
 /**
  *
@@ -15,7 +15,7 @@ public class App{
     private static FrameDesigner frameDesigner = FrameDesigner.getInstance();
 
     public static void main( String[] args ) {
-        frameDesigner.frame.setLayout(new GridLayout(5,5));
+        frameDesigner.frame.setLayout(new FlowLayout());
         placeProtolComponents();
         placeUrlComponents();
         // placeMethodComponents();
@@ -27,7 +27,8 @@ public class App{
         placeResponseTitle();
         placeResponseContent();
         // 设置窗口大小
-        frameDesigner.frame.setSize(1000, 800);
+        frameDesigner.frame.setSize(1000, 900);
+        frameDesigner.frame.setResizable(false);
         //需要多大的窗口，自适应
         //frame.pack();
         // 设置窗口可见
@@ -65,12 +66,11 @@ public class App{
 
     private static void placeUrlComponents(){
         JLabel userLabel = new JLabel("Url:");
-        // todo urlPanel.add(frameDesigner.methodPanel,BorderLayout.CENTER);
+        urlPanel.add(frameDesigner.methodPanel,BorderLayout.CENTER);
         urlPanel.add(userLabel);
-
         urlPanel.add(frameDesigner.urlText);
         frameDesigner.frame.add(urlPanel,BorderLayout.CENTER);
-        frameDesigner.frame.add(frameDesigner.typePanel,BorderLayout.CENTER);
+        frameDesigner.frame.add(typePanel,BorderLayout.CENTER);
     }
 
     private static void placeSendComponents(){
@@ -86,7 +86,7 @@ public class App{
         selectList.addItem("Xml");
         selectList.addItem("Separator");
         selectList.addActionListener(typeListener);
-        frameDesigner.typePanel.add(selectList);
+        typePanel.add(selectList);
     }
 
     private static void placeFileComponents(){
@@ -109,7 +109,10 @@ public class App{
 
     private static void placeReqeustContent(){
         // 多行文本域
-        frameDesigner.requContextPanel.add(frameDesigner.requTextArea);
+        JScrollPane requScroll = new JScrollPane();
+        requScroll.setBounds(28,209,752,265);
+        frameDesigner.requContextPanel.add(requScroll);
+        requScroll.setViewportView(requTextArea);
         frameDesigner.frame.add(frameDesigner.requContextPanel,BorderLayout.CENTER);
     }
 
@@ -121,8 +124,10 @@ public class App{
 
     private static void placeResponseContent(){
         // 多行文本域
-        JTextArea resptextarea = new JTextArea(20, 50);
-        frameDesigner.respContextPanel.add(resptextarea);
+        JScrollPane respScroll = new JScrollPane();
+        respScroll.setBounds(28,209,752,265);
+        frameDesigner.respContextPanel.add(respScroll);
+        respScroll.setViewportView(respTextArea);
         frameDesigner.frame.add(frameDesigner.respContextPanel,BorderLayout.CENTER);
     }
 

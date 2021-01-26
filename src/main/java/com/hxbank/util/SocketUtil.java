@@ -1,5 +1,6 @@
 package com.hxbank.util;
 
+import com.hxbank.frame.FrameDesigner;
 import com.hxbank.listener.BaseEntity;
 import java.io.*;
 import java.net.Socket;
@@ -7,11 +8,13 @@ import java.util.concurrent.CountDownLatch;
 
 public class SocketUtil extends BaseEntity {
 
+    private static FrameDesigner frameDesigner = FrameDesigner.getInstance();
+
     private static final String FILE_START = "file:";
     private static final String MESSAGE_END = "@@@@";
     private static final String FILE_NAME_END = "$_?";
 
-    public void init(){
+    public static void init(){
         System.out.println("socket initing ...");
         System.out.println(protol);
         System.out.println(method);
@@ -22,50 +25,98 @@ public class SocketUtil extends BaseEntity {
         System.out.println(requestContext);
     }
 
+    public static void send(){
+        if(isFileBlank()){
+            sendWithoutFile();
+        }else{
+            try {
+                sendWithFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+                frameDesigner.respTextArea.setText(e.getMessage());
+            }
+        }
+        /*if("Separator".equals(type)){
+            sendWithSeparator();
+        }else if("Xml".equals(type)){
+            try {
+                sendWithXml();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{}*/
+    }
+
+    public static void sendWithoutFile(){
+        try {
+            Socket socket = new Socket(getHost(), Integer.parseInt(getPort()));
+            InputStream is = socket.getInputStream();
+            OutputStream os = socket.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
+            bw.write(requestContext+MESSAGE_END);
+            bw.flush();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            String mess = br.readLine();
+            System.out.println("receive：" + mess);
+            frameDesigner.respTextArea.setText(mess);
+        } catch (IOException e) {
+            e.printStackTrace();
+            frameDesigner.respTextArea.setText(e.getMessage());
+        }
+    }
+
     /**
      * 示例：String str = "Xhj1001#1153285#201310230099112#10250001002171482#1#1#对私#1|6226310510420134|135067|500|J|#@@@@";
      *
      * @param
      * @return
      */
-    public static String send() throws IOException {
+    public static String sendWithFile() throws IOException {
         Socket socket = new Socket(getHost(), Integer.parseInt(getPort()));
         OutputStream os = socket.getOutputStream();
         InputStream iss = socket.getInputStream();
-        BufferedReader br = new BufferedReader(new InputStreamReader(iss, "utf-8"));
+        BufferedReader br = new BufferedReader(new InputStreamReader(iss, "GBK"));
         File sendFile = new File(filePathStr);
         InputStream is = new FileInputStream(sendFile);
         long fileLength = sendFile.length();
         System.out.println("文件长度：" + fileLength);
         /*发送第一部分的文本信息，对应text1*/
-        int a = requestContext.getBytes().length;
-        os.write(requestContext.getBytes());
+        int a = requestContext.getBytes("GBK").length;
+        os.write(requestContext.getBytes("GBK"));
         /*发送开始的标识，对应image_start*/
-        int c = FILE_START.getBytes().length;
-        os.write(FILE_START.getBytes());
+        int c = FILE_START.getBytes("GBK").length;
+        os.write(FILE_START.getBytes("GBK"));
         // 发送文件名称，对应image_file_name
-        int d = sendFile.getName().getBytes().length;
-        os.write(sendFile.getName().getBytes());
+        int d = sendFile.getName().getBytes("GBK").length;
+        os.write(sendFile.getName().getBytes("GBK"));
         //  发送文件名称结束的标识，对应image_file_name_end
-        int f = FILE_NAME_END.getBytes().length;
-        os.write(FILE_NAME_END.getBytes());
+        int f = FILE_NAME_END.getBytes("GBK").length;
+        os.write(FILE_NAME_END.getBytes("GBK"));
         //  发送文件的长度，对应image_file_length
         byte[] bs = LongToBytes(a + c + d + f);
         os.write(bs);
+       /* int sum = a + c + d + f;
+        os.write(String.valueOf(sum).getBytes("GBK"));*/
         //  发送文件，对应image
         int length;
         byte[] b = new byte[1024];
         while ((length = is.read(b)) > 0) {
             os.write(b, 0, length);
         }
+       /* while ((length = is.read(b)) > 0) {
+            String str = new String(b,0, length,"GBK");
+            os.write(str.getBytes("GBK"));
+        }*/
 
         /*发送一条完整信息结束的标识，对应message_end*/
-        os.write(MESSAGE_END.getBytes());
+        os.write(MESSAGE_END.getBytes("GBK"));
         os.flush();
         socket.shutdownOutput();
         String info = null;
         while ((info = br.readLine()) != null) {
             System.out.println("receive：" + info);
+            frameDesigner.respTextArea.setText(info);
         }
         socket.close();
         return null;
@@ -92,7 +143,7 @@ public class SocketUtil extends BaseEntity {
 
     private static CountDownLatch cld = new CountDownLatch(1);
 
-    public static void main(String[] args) {
+    /*public static void main1(String[] args) {
         String str = "Xhj1001#1153285#201310230099112#10250001002171482#1#1#对私#1|6226310510420134|135067|500|J|#@@@@";
 
         for (int i = 0; i < 1; i++) {
@@ -112,7 +163,7 @@ public class SocketUtil extends BaseEntity {
             t.start();
             cld.countDown();
         }
-    }
+    }*/
 
     public static byte[] LongToBytes(long values) {
         byte[] buffer = new byte[8];
@@ -131,4 +182,5 @@ public class SocketUtil extends BaseEntity {
         }
         return values;
     }
+
 }

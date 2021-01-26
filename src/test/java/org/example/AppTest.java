@@ -90,14 +90,14 @@ public class AppTest
             //window.setUndecorated(true);
 
             //按钮的
-            button1.addActionListener(new ActionListener() {
+            /*button1.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent actionEvent) {
                     System.out.println("华夏银行前置机报文发送工具");
                     Dialog dia = new JDialog(window,"请选择文件");
                     dia.setSize(200, 200);
                     dia.setVisible(true);
                 }
-            });
+            });*/
             //窗口的
             window.addWindowListener(new WindowAdapter() {
 

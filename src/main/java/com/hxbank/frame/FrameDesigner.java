@@ -16,6 +16,7 @@ public class FrameDesigner {
     public static JPanel respContextPanel = new JPanel(); // 创建响应内容面板
     public static JTextField urlText = new JTextField(20);
     public static JTextArea requTextArea = new JTextArea(20, 50);
+    public static JTextArea respTextArea = new JTextArea(20, 50);
     public static JTextField filePath = new JTextField(50);
 
     public String getUrl(){
@@ -33,5 +34,7 @@ public class FrameDesigner {
     private static class InnerClassHolder{
         private static FrameDesigner instance = new FrameDesigner();
     }
+
+    private FrameDesigner(){}
 
 }

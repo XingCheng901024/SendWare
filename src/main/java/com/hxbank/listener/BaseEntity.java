@@ -3,9 +3,9 @@ package com.hxbank.listener;
 public class BaseEntity {
 
     public static String protol;
-    public static String method;
+    public static String method = "post";
     public static String url;
-    public static String type;
+    public static String type = "Separator";
     public static String filePathStr;
     public static String requestContext;
 
@@ -27,11 +27,11 @@ public class BaseEntity {
         }
     }
 
-    public static boolean isFileSelected(){
+    public static boolean isFileBlank(){
         return isBlank(filePathStr);
     }
 
-    private static boolean isBlank(String str) {
+    protected static boolean isBlank(String str) {
         int strLen;
         if (str != null && (strLen = str.length()) != 0) {
             for(int i = 0; i < strLen; ++i) {
